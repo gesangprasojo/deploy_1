@@ -1,0 +1,87 @@
+upstream ssr_server{
+server http://localhost:3000;
+}
+
+
+server {
+      listen  91;
+      server_name enesis;
+      set $DOM $server_name;
+      set $run 'big';
+      set $kan $DOM$run;
+      if ($kan = 'enesisbig'){
+      # return 301 https://$DOM;
+      set $GE "/var/www/project/enesis/public";
+      }
+      root  $GE;
+      index index.html index.htm index.php;
+      location / {
+      try_files $uri $uri/ /index.php?$query_string;
+       # kill cache
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+        if_modified_since off;
+        expires off;
+        etag off;
+      }
+      pagespeed on;
+      pagespeed FileCachePath /var/ngx_pagespeed_cache;
+      location ~ "\.pagespeed\.([a-z]\.)?[a-z]{2}\.[^.]{10}\.[^.]+" { add_header "" ""; }
+      location ~ "^/ngx_pagespeed_static/" { }
+      location ~ "^/ngx_pagespeed_beacon" { }
+      error_log /var/log/nginx/error.log error;
+      error_log /var/log/nginx/crit.log crit;
+      error_log /var/log/nginx/alert.log alert;
+      error_log /var/log/nginx/emerg.log emerg;
+
+      location ~ \.php(.*)$ {
+
+      fastcgi_pass unix:/run/php-fpm.sock;
+      fastcgi_split_path_info ^(.+\.php)(/.+)$;
+      fastcgi_index index.php;
+      include  fastcgi_params;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      fastcgi_param PATH_INFO $fastcgi_path_info;
+  }
+}
+server {
+      listen  81;
+      server_name web;
+      set $DOM $server_name;
+      set $run 'big';
+      set $kan $DOM$run;
+      if ($kan = 'webbig'){
+      # return 301 https://$DOM;
+      set $GE "/home/website/www/public";
+      }
+      root  $GE;
+      index index.html index.htm index.php;
+      location / {
+      try_files $uri $uri/ /index.php?$query_string;
+       # kill cache
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+        if_modified_since off;
+        expires off;
+        etag off;
+      }
+      pagespeed on;
+      pagespeed FileCachePath /var/ngx_pagespeed_cache;
+      location ~ "\.pagespeed\.([a-z]\.)?[a-z]{2}\.[^.]{10}\.[^.]+" { add_header "" ""; }
+      location ~ "^/ngx_pagespeed_static/" { }
+      location ~ "^/ngx_pagespeed_beacon" { }
+      error_log /var/log/nginx/error.log error;
+      error_log /var/log/nginx/crit.log crit;
+      error_log /var/log/nginx/alert.log alert;
+      error_log /var/log/nginx/emerg.log emerg;
+
+      location ~ \.php(.*)$ {
+
+      fastcgi_pass unix:/run/php-fpm.sock;
+      fastcgi_split_path_info ^(.+\.php)(/.+)$;
+      fastcgi_index index.php;
+      include  fastcgi_params;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      fastcgi_param PATH_INFO $fastcgi_path_info;
+  }
+}
